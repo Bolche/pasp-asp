@@ -2,13 +2,14 @@
 #include <fstream>
 
 #include "Program.h"
-#include "LoopFormulasTranslator.h"
+#include "SmodelsBridge.h"
 #include "parser.h"
 
 using namespace std;
 
 int main (int argc, char** argv) {
-    Program p;
+    SmodelsBrige sb;
+    Program p(&sb);
 
     if (argc < 2)
         fatal("Usage: pasp-asp [file]");
@@ -17,13 +18,7 @@ int main (int argc, char** argv) {
     ifstream probabilitiesFile (argv[1]);
     parseProbabilities(p, probabilitiesFile);
 
-    /* PSatToMaxSAT expected that the n atoms with probabilities are numbered 1
-       to n-1. We need to reassign the numbers.*/
-    p.reassignLiteralNumbers();
-    
-    LoopFormulasTranslator translator(p);
-    translator.translate();
-    cout << translator.getDimacsCNF() << endl;
+    p.solve();
     
     return 0;
 }

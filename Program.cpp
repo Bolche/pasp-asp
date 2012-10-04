@@ -1,44 +1,11 @@
-/* 
- * File:   Program.cpp
- * Author: eduardo
- * 
- * Created on 7 de Junho de 2011, 02:59
- */
-
 #include <algorithm>
 #include <sstream>
+#include <cstdlib>
+
+#include <Eigen/Cholesky>
 #include "Program.h"
 
-Rule::Rule(const Literal h, const vector<Literal>& p, const vector<Literal>& n): head(h), positiveBody(p), negativeBody(n) {}
 
-Rule_ptr Program::newRule(const Literal h, const vector<Literal>& p, const vector<Literal>& n) {
-    Rule_ptr newRule = make_shared<Rule> (h, p, n);
-    rules.insert(make_pair(h, newRule));
-    
-    insertLiteralsInTable(h, p, n);
-    
-    return newRule;
-}
-
-void Program::insertLiteralsInTable(const Literal h, const vector<Literal>& p, const vector<Literal>& n) {
-    string emptyName;
-    symTable[h] = emptyName;
-    setBiggestLiteral(h);
-    for (auto lit : p) {
-        symTable[lit] = emptyName;
-        setBiggestLiteral(lit);
-    }
-    for (auto lit : n) {
-        symTable[lit] = emptyName;
-        setBiggestLiteral(lit);
-    }
-}
-
-inline void Program::setBiggestLiteral(const Literal& l) {
-    if (l > biggestLiteral)
-        biggestLiteral = l;
-}
-    
 unsigned int Program::numLiterals() const {
     return symTable.size();
 }
@@ -56,10 +23,6 @@ unsigned int Program::numDecimals() const {
     return maxDecimals - 2;
 }
 
-Literal Program::lastLiteral() const {
-    return biggestLiteral;
-}
-
 void Program::nameLiteral(const Literal& l, const string& n) {
     symTable[l]=n;
 }
@@ -74,15 +37,6 @@ void Program::assignProbability(const string& literalName, const string& n) {
         probabilityTable[begin->first]=n;
 }
 
-//TODO isso não deveria estar aqui. Isso é específico do DIMACS CNF
-string Program::getProbabilityAssignment() const {
-    stringstream result;
-    for (auto begin = probabilityTable.begin(); begin != probabilityTable.end(); begin++)
-        result << "a " << begin->first << ' ' << begin->second << endl;
-    
-    return result.str();
-}
-
 string Program::getLiteralName(const Literal& l) const {
     return symTable.at(l);
 }
@@ -91,40 +45,51 @@ string Program::getLiteralProbability(const Literal& l) const {
     return probabilityTable.at(l);
 }
 
-ruleRange Program::getRulesWithHead(const Literal head) const {
-    return rules.equal_range(head);
+void Program::solve() {
+    unsigned int matrixSize = numProbabilities()+1;
+    Eigen::MatrixXb base(matrixSize, matrixSize);
+    Eigen::VectorXd costs = Eigen::VectorXd::Ones(matrixSize);
+    for (int i=0; i < matrixSize; i++)
+        if (consistent(base(i)))
+            costs(i) = 0;
+
+    Eigen::VectorXd p;
+    int i;
+    probabilityTable::const_iterator it;
+    for(it = probabilityTable.begin(), i=0; it != probabilityTable.end(); it++, i++)
+        p[i] = atof(it->second.c_str());
+
+    Eigen::VectorXd pi = base.ldlt().solve(p);
+
+    while (costs.dot(pi) > 0) {
+        
+    }
+    
+    setInitialBase(base);
 }
 
-void Program::reassignLiteralNumbers() {
-    map<Literal, Literal> translationTable;
-    Literal nextAvaliableLiteral(1);
-    //Create a translation table
-    for (auto entry: probabilityTable)
-        translationTable[entry.first] = nextAvaliableLiteral++;
+void Program::setInitialBase(Eigen::MatrixXb &m) const {
+    for(int i = 0; i <= numProbabilities(); i++)
+        for(int i = 0; i <= numProbabilities(); i++)
+            m(i,j) = (i<=j);
+}
 
-    for (Literal lit = Literal(1); lit <= lastLiteral(); lit++)
-        if (translationTable.count(lit) == 0)
-            translationTable[lit] = nextAvaliableLiteral++;
-
-    //do the reassignment
-    multimap<Literal, Rule_ptr> newRules;
-    unordered_map<Literal, string> newSymTable;
-    map<Literal, string> newProbabilityTable;
-    for (auto entry: probabilityTable)
-        newProbabilityTable[translationTable[entry.first]] = entry.second;
-    probabilityTable.swap(newProbabilityTable);
-
-    for (auto entry: symTable)
-        newSymTable[translationTable[entry.first]] = entry.second;
-    symTable.swap(newSymTable);
-    
-    for(auto rule: rules) {
-        newRules.insert(make_pair(translationTable[rule.first], rule.second));
-        rule.second->head = translationTable[rule.second->head];
-        for(Literal &lit: rule.second->positiveBody)
-            lit = translationTable[lit];
-        for(Literal &lit: rule.second->negativeBody)
-            lit = translationTable[lit];
+bool Program::consistent(const Eigen::VectorXb &v) const {
+    int i;
+    probabilityTable::const_iterator it;
+    vector<Literal> positiveLiterals, negativeLiterals;
+    for(it = probabilityTable.begin(), i=1; it != probabilityTable.end(); it++, i++) {
+        if (!v[i])
+            positiveLiterals.push_back(it->first);
+        else
+            negativeLiterals.push_back(it->first);
     }
-    rules.swap(newRules);
+
+    Program newProg(*this);
+    newProg.addConstraint(positiveLiterals, negativeLiterals);
+    return newProg.consistent();        
+}
+
+bool Program::consistent() const {
+
 }
