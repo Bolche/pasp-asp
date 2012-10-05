@@ -1,11 +1,12 @@
 #ifndef BRIDGE_H
 #define BRIDGE_H
 
-class Bridge{
+#include <unordered_set>
+#include "Program.h"
+
+class Bridge {
 public:
-    
-private:
-    
+    unordered_set<Literal> getAnswerSet(Program &p);
 };
 
 #endif //BRIDGE_H

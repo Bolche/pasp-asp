@@ -27,7 +27,7 @@ ifeq ($(TYPE),release)
 endif
 
 #Test for C++11 support
-TESTSOURCEFILE := $(shell mktemp --suffix=.cpp)
+TESTSOURCEFILE := $(shell mktemp XXXXXXXX.cpp)
 TEMP := $(shell printf '\#include <list>\n\#include "c++11_warning.h"\nint main(){std::list<int> a={1,2,3};\nfor(auto i: a){};\nreturn 0;\n}' > $(TESTSOURCEFILE) )
 TEMP := $(shell $(CC) $(TESTSOURCEFILE) -I. -o cpp11test 2> /dev/null) #try compiling without flags
 ifneq ($(shell test -f cpp11test || echo 0),0)

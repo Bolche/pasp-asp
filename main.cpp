@@ -8,7 +8,7 @@
 using namespace std;
 
 int main (int argc, char** argv) {
-    SmodelsBrige sb;
+    SmodelsBridge sb;
     Program p(&sb);
 
     if (argc < 2)
