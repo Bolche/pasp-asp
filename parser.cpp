@@ -81,7 +81,7 @@ void parseGroundedASP(Program &p, istream &in) {
 void parseProbabilities(Program &p, istream &in) {
     while (in.good()) {
         string literal;
-        string probability;
+        double probability;
         in >> literal >> probability;
         if (literal != "")
             p.assignProbability(literal, probability);

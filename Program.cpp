@@ -1,6 +1,7 @@
 #include <algorithm>
 #include <sstream>
 #include <cstdlib>
+#include <limits>
 #include <Eigen/Cholesky>
 #include <Eigen/LU>
 
@@ -61,20 +62,21 @@ pair<Eigen::MatrixXd, Eigen::VectorXd> Program::solve() const {
         p[i] = it->second;
     p[0] = 1;
 
+    Eigen::MatrixXd inverseBase = base.inverse();
     Eigen::VectorXd pi = base.ldlt().solve(p);
     while (costs.dot(pi) > 0) {
-        Eigen::VectorXd A = selectColumn(base, costs);
+        Eigen::VectorXd A = selectColumn(inverseBase, costs);
         if (A.size() == 0)
             throw false;
-        changeBase(base, A, pi, costs);
+        changeBase(base, inverseBase, A, pi, costs);
         pi = base.ldlt().solve(p);
     }
 
     return make_pair(base, pi);
 }
 
-Eigen::VectorXd Program::selectColumn(const Eigen::MatrixXd &base, const Eigen::VectorXd &costs) const {
-    Eigen::RowVectorXd u = costs.transpose() * base.inverse();
+Eigen::VectorXd Program::selectColumn(const Eigen::MatrixXd &inverseBase, const Eigen::VectorXd &costs) const {
+    Eigen::RowVectorXd u = costs.transpose() * inverseBase;
     unordered_map<Literal, double> weightConstraint;
     unsigned int i;
     map<Literal, double>::const_iterator it;
@@ -97,8 +99,23 @@ Eigen::VectorXd Program::answerSetToVector(const unordered_set<Literal>& as) con
     return v;
 }
 
-void Program::changeBase(Eigen::MatrixXd &base, const Eigen::VectorXd &A, const Eigen::VectorXd &pi, Eigen::VectorXd &costs) const {
+void Program::changeBase(Eigen::MatrixXd &base, Eigen::MatrixXd &inverseBase, const Eigen::VectorXd &A, const Eigen::VectorXd &pi, Eigen::VectorXd &costs) const {
+    Eigen::VectorXd u = -(inverseBase * A);
+    double minTheta = numeric_limits<double>.infinity();
+    unsigned int minIndex;
+    for(unsigned int i=0; i < u.size(); i++) {
+        if (u[i] > 0) {
+            double theta = pi[i]/u[i];
+            if(theta < minTheta) {
+                minTheta = theta;
+                minIndex = i;
+            }
+        }
+    }
 
+    base.col(minIndex) = A;
+    inverseBase = base.inverse();
+    costs[minIndex] = 0;
 }
 
 void Program::setInitialBase(Eigen::MatrixXd &m) const {
@@ -124,5 +141,5 @@ bool Program::consistent(const Eigen::VectorXd &v) const {
 }
 
 bool Program::consistent() const {
-    return true;
+    return bridge->existsAnswerSet(*this);
 }

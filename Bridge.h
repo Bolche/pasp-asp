@@ -7,6 +7,7 @@
 class Bridge {
 public:
     unordered_set<Literal> getAnswerSet(Program &p);
+    bool existsAnswerSet(Program &p);
 };
 
 #endif //BRIDGE_H
