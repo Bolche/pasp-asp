@@ -38,12 +38,8 @@ double Program::getLiteralProbability(const Literal& l) const {
     return probabilityTable.at(l);
 }
 
-void Program::addWeightConstraint(const unordered_map<Literal, double>& weights, double limit) {
-
-}
-
-void Program::addConstraint(const vector<Literal>& positiveLiterals, const vector<Literal>& negativeLiterals) {
-
+void Program::addRule(Rule_ptr r) {
+    rules.push_back(r);
 }
 
 pair<Eigen::MatrixXd, Eigen::VectorXd> Program::solve() const {
@@ -101,7 +97,7 @@ Eigen::VectorXd Program::answerSetToVector(const unordered_set<Literal>& as) con
 
 void Program::changeBase(Eigen::MatrixXd &base, Eigen::MatrixXd &inverseBase, const Eigen::VectorXd &A, const Eigen::VectorXd &pi, Eigen::VectorXd &costs) const {
     Eigen::VectorXd u = -(inverseBase * A);
-    double minTheta = numeric_limits<double>.infinity();
+    double minTheta = numeric_limits<double>::infinity();
     unsigned int minIndex;
     for(unsigned int i=0; i < u.size(); i++) {
         if (u[i] > 0) {

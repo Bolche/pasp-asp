@@ -6,8 +6,8 @@
 
 class Bridge {
 public:
-    unordered_set<Literal> getAnswerSet(Program &p);
-    bool existsAnswerSet(Program &p);
+    unordered_set<Literal> getAnswerSet(const Program &p);
+    bool existsAnswerSet(const Program &p);
 };
 
 #endif //BRIDGE_H
