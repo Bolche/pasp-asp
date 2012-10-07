@@ -32,6 +32,8 @@ public:
     bool consistent() const;
     bool consistent(const Eigen::VectorXd &v) const;
     pair<Eigen::MatrixXd, Eigen::VectorXd> solve() const;
+    list<Literal> positiveTargets;
+    list<Literal> negativeTargets;
 private:
     void setInitialBase(Eigen::MatrixXd &m) const;
     Eigen::VectorXd selectColumn(const Eigen::MatrixXd &base, const Eigen::VectorXd &costs) const;

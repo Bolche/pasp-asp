@@ -25,7 +25,7 @@ inline void parseRules(Program &p, istream &in) {
         for (int i = 0; i < bodySize - negativeBodySize; i++)
             in >> positiveBody[i];
         
-        p.newRule(head, positiveBody, negativeBody);
+        p.addRule(make_shared<BasicRule>(head, positiveBody, negativeBody));
         in >> ruleType;
     }
 }
@@ -50,7 +50,7 @@ inline void parsePositiveTargets(Program &p, istream &in) {
 
     in >> l;    
     while (l != 0) {
-        p.newRule(l, {}, {});
+        p.positiveTargets.push_back(l);
         in >> l;
     }
 }
@@ -64,9 +64,7 @@ inline void parseNegativeTargets(Program &p, istream &in) {
 
     in >> l;
     while (l != 0) {
-        Literal newLit = p.lastLiteral();
-        newLit++;
-        p.newRule(newLit, {l}, {newLit});
+        p.negativeTargets.push_back(l);
         in >> l;
     }
 }

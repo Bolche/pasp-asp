@@ -6,8 +6,8 @@
 
 class Bridge {
 public:
-    unordered_set<Literal> getAnswerSet(const Program &p);
-    bool existsAnswerSet(const Program &p);
+    virtual unordered_set<Literal> getAnswerSet(const Program &p) = 0;
+    virtual bool existsAnswerSet(const Program &p) = 0;
 };
 
 #endif //BRIDGE_H

@@ -81,8 +81,13 @@ Eigen::VectorXd Program::selectColumn(const Eigen::MatrixXd &inverseBase, const 
     }
 
     Program newProg(*this);
-    newProg.addWeightConstraint(weightConstraint, -u[0]);
-    return answerSetToVector(bridge->getAnswerSet(newProg));
+    newProg.addRule(make_shared<WeightRule>(weightConstraint, -u[0]));
+    try {
+        return answerSetToVector(bridge->getAnswerSet(newProg));
+    } catch (bool e) {
+        Eigen::VectorXd v;
+        return v;
+    }
 }
 
 Eigen::VectorXd Program::answerSetToVector(const unordered_set<Literal>& as) const {
@@ -132,7 +137,7 @@ bool Program::consistent(const Eigen::VectorXd &v) const {
     }
 
     Program newProg(*this);
-    newProg.addConstraint(positiveLiterals, negativeLiterals);
+    newProg.addRule(make_shared<ConstraintRule>(positiveLiterals, negativeLiterals));
     return newProg.consistent();        
 }
 
