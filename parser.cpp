@@ -12,20 +12,39 @@ inline void parseRules(Program &p, istream &in) {
     
     in >> ruleType;
     while (ruleType != 0) {
-        if (ruleType != 1)
-            fatal("Unsupported rule type");
-        
-        Literal head;
-        int bodySize, negativeBodySize;
-        in >> head >> bodySize >> negativeBodySize;
-        vector<Literal> negativeBody(negativeBodySize), positiveBody(bodySize - negativeBodySize);
+        switch (ruleType) {
+        case 1:
+            Literal head;
+            int bodySize, negativeBodySize;
+            in >> head >> bodySize >> negativeBodySize;
+            vector<Literal> negativeBody(negativeBodySize), positiveBody(bodySize - negativeBodySize);
 
-        for (int i = 0; i < negativeBodySize; i++)
-            in >> negativeBody[i];
-        for (int i = 0; i < bodySize - negativeBodySize; i++)
-            in >> positiveBody[i];
+            for (int i = 0; i < negativeBodySize; i++)
+                in >> negativeBody[i];
+            for (int i = 0; i < bodySize - negativeBodySize; i++)
+                in >> positiveBody[i];
         
-        p.addRule(make_shared<BasicRule>(head, positiveBody, negativeBody));
+            p.addRule(make_shared<BasicRule>(head, positiveBody, negativeBody));
+            break;
+        case 3:
+            int headSize, bodySize, negativeBodySize;
+            in >> headSize;
+            vector<Literal> head(headSize);
+            for (int i = 0; i < headSize; i++)
+                in >> head[i];
+
+            in >> bodySize >> negativeBodySize;
+            vector<Literal> negativeBody(negativeBodySize), positiveBody(bodySize - negativeBodySize);
+
+            for (int i = 0; i < negativeBodySize; i++)
+                in >> negativeBody[i];
+            for (int i = 0; i < bodySize - negativeBodySize; i++)
+                in >> positiveBody[i];
+        
+            p.addRule(make_shared<ChoiceRule>(head, positiveBody, negativeBody));
+            break;
+        default:
+            fatal("unsupported rule type");
         in >> ruleType;
     }
 }
