@@ -20,4 +20,5 @@ Program MockBridge::spyArguments(unsigned int i) const {
 void MockBridge::setNewAnswerSetSet(const vector<unordered_set<Literal>> &as) {
     answerSets = as;
     responseCount = 0;
+    arguments.clear();
 }
