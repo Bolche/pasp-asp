@@ -22,7 +22,15 @@ struct BasicRule: public Rule {
     std::vector<Literal> negativeBody;
     RuleType type;
 };
- 
+
+struct ChoiceRule: public Rule {
+ChoiceRule(const std::vector<Literal>& h, const std::vector<Literal>& p, const std::vector<Literal>& n) : head(h), positiveBody(p), negativeBody(n), type(BASIC) {};
+    std::vector<Literal> head;
+    std::vector<Literal> positiveBody;
+    std::vector<Literal> negativeBody;
+    RuleType type;
+};
+
 struct ConstraintRule: public Rule {
     ConstraintRule(const std::vector<Literal>& p, const std::vector<Literal>& n) : positiveBody(p), negativeBody(n), type(CONSTRAINT) {};
     std::vector<Literal> positiveBody;

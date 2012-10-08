@@ -22,6 +22,8 @@ public:
     Program (Bridge *b) : bridge(b) {};
     virtual ~Program() {};
     void addRule(Rule_ptr);
+    list<Rule_ptr>::const_iterator rulesBeginIterator() const;
+    list<Rule_ptr>::const_iterator rulesEndIterator() const;
     void nameLiteral(const Literal& l, const string& n);
     void assignProbability(const string& literalName, double n);
     string getLiteralName(const Literal& l) const;
@@ -43,6 +45,8 @@ private:
     unordered_map<Literal, string> symTable;
     map<Literal, double> probabilityTable;
     Bridge *bridge;
+
+    friend class ProgramTest;
 };
 
 #endif	/* PROGRAM_H */

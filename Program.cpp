@@ -2,7 +2,6 @@
 #include <sstream>
 #include <cstdlib>
 #include <limits>
-#include <Eigen/Cholesky>
 #include <Eigen/LU>
 
 #include "Program.h"
@@ -42,6 +41,13 @@ void Program::addRule(Rule_ptr r) {
     rules.push_back(r);
 }
 
+list<Rule_ptr>::const_iterator Program::rulesBeginIterator() const {
+    return rules.begin();
+}
+list<Rule_ptr>::const_iterator Program::rulesEndIterator() const {
+    return rules.end();
+}
+
 pair<Eigen::MatrixXd, Eigen::VectorXd> Program::solve() const {
     unsigned int matrixSize = numProbabilities()+1;
     Eigen::MatrixXd base(matrixSize, matrixSize);
@@ -59,13 +65,13 @@ pair<Eigen::MatrixXd, Eigen::VectorXd> Program::solve() const {
     p[0] = 1;
 
     Eigen::MatrixXd inverseBase = base.inverse();
-    Eigen::VectorXd pi = base.ldlt().solve(p);
+    Eigen::VectorXd pi = inverseBase * p;
     while (costs.dot(pi) > 0) {
         Eigen::VectorXd A = selectColumn(inverseBase, costs);
         if (A.size() == 0)
             throw false;
         changeBase(base, inverseBase, A, pi, costs);
-        pi = base.ldlt().solve(p);
+        pi = inverseBase * p;
     }
 
     return make_pair(base, pi);
@@ -101,18 +107,11 @@ Eigen::VectorXd Program::answerSetToVector(const unordered_set<Literal>& as) con
 }
 
 void Program::changeBase(Eigen::MatrixXd &base, Eigen::MatrixXd &inverseBase, const Eigen::VectorXd &A, const Eigen::VectorXd &pi, Eigen::VectorXd &costs) const {
-    Eigen::VectorXd u = -(inverseBase * A);
-    double minTheta = numeric_limits<double>::infinity();
+    Eigen::VectorXd u = inverseBase * A;
     unsigned int minIndex;
-    for(unsigned int i=0; i < u.size(); i++) {
-        if (u[i] > 0) {
-            double theta = pi[i]/u[i];
-            if(theta < minTheta) {
-                minTheta = theta;
-                minIndex = i;
-            }
-        }
-    }
+    // Turn all negative coeficientes into infinity
+    u = u + ((u.array() > 0).cast<double>() * numeric_limits<double>::infinity()).matrix();
+    pi.cwiseQuotient(u).minCoeff(&minIndex);
 
     base.col(minIndex) = A;
     inverseBase = base.inverse();
