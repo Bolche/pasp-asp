@@ -1,5 +1,5 @@
-#ifndef PROGRAM_H
-#define	PROGRAM_H
+#ifndef PASPPROGRAM_H
+#define	PASPPROGRAM_H
 
 #include <string>
 #include <map>
@@ -28,7 +28,6 @@ public:
     void assignProbability(const string& literalName, double n);
     string getLiteralName(const Literal& l) const;
     double getLiteralProbability(const Literal& l) const;
-    unsigned int numLiterals() const;
     unsigned int numProbabilities() const;
     void initializeBase(Eigen::MatrixXd& m) const;
     bool consistent() const;
@@ -49,4 +48,4 @@ private:
     friend class ProgramTest;
 };
 
-#endif	/* PROGRAM_H */
+#endif	/* PASPPROGRAM_H */

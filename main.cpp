@@ -1,4 +1,5 @@
 #include <cstdlib>
+#include <iostream>
 #include <fstream>
 
 #include "Program.h"
@@ -18,7 +19,15 @@ int main (int argc, char** argv) {
     ifstream probabilitiesFile (argv[1]);
     parseProbabilities(p, probabilitiesFile);
 
-    p.solve();
+    pair<Eigen::MatrixXd, Eigen::VectorXd> solution;
+    try {
+        solution = p.solve();
+        cout << "ANSWER: CONSISTENT" << endl;
+        cout << "Base:" << endl << solution.first << endl << endl << "Probability assignment:" << endl << solution.second << endl;
+    } catch (bool e) {
+        cout << "The program and the probabilities are inconsistent. There is no solution." << endl;
+        cout << "ANSWER: INCONSISTENT" << endl;
+    }
     
     return 0;
 }

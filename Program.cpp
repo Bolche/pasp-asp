@@ -7,10 +7,6 @@
 #include "Program.h"
 #include "Bridge.h"
 
-unsigned int Program::numLiterals() const {
-    return symTable.size();
-}
-
 unsigned int Program::numProbabilities() const {
     return probabilityTable.size();
 }

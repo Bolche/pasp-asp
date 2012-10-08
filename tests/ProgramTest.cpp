@@ -48,14 +48,14 @@ void ProgramTest::testConsistentWithPartialAS() {
     CPPUNIT_ASSERT(p1.consistent( Eigen::Vector3d({1, 1, 1}) ));
 
     Rule_ptr generatedConstraints = *(--mock.spyArguments(0).rulesEndIterator());
-    CPPUNIT_ASSERT_LIST_EQUALS(vector<Literal>({3, 4}), reinterpret_cast<ConstraintRule *>(generatedConstraints.get())->positiveBody);
+    CPPUNIT_ASSERT_LIST_EQUALS(vector<Literal>({3, 4}), dynamic_cast<ConstraintRule *>(generatedConstraints.get())->positiveBody);
 
     generatedConstraints = *(--mock.spyArguments(1).rulesEndIterator());
-    CPPUNIT_ASSERT_LIST_EQUALS(vector<Literal>({4}), reinterpret_cast<ConstraintRule *>(generatedConstraints.get())->positiveBody);
-    CPPUNIT_ASSERT_LIST_EQUALS(vector<Literal>({3}), reinterpret_cast<ConstraintRule *>(generatedConstraints.get())->negativeBody);
+    CPPUNIT_ASSERT_LIST_EQUALS(vector<Literal>({4}), dynamic_cast<ConstraintRule *>(generatedConstraints.get())->positiveBody);
+    CPPUNIT_ASSERT_LIST_EQUALS(vector<Literal>({3}), dynamic_cast<ConstraintRule *>(generatedConstraints.get())->negativeBody);
     
     generatedConstraints = *(--mock.spyArguments(2).rulesEndIterator());
-    CPPUNIT_ASSERT_LIST_EQUALS(vector<Literal>({3, 4}), reinterpret_cast<ConstraintRule *>(generatedConstraints.get())->negativeBody);
+    CPPUNIT_ASSERT_LIST_EQUALS(vector<Literal>({3, 4}), dynamic_cast<ConstraintRule *>(generatedConstraints.get())->negativeBody);
 }
 
 void ProgramTest::testChangeBase() {
@@ -118,7 +118,7 @@ void ProgramTest::testSelectColumn() {
     CPPUNIT_ASSERT_EQUAL(expected, Eigen::VectorXd(costs.transpose() * inverseBase));
 
     Rule_ptr lastRule = *(--mock.spyArguments(0).rulesEndIterator());
-    WeightRule* generatedConstraints = reinterpret_cast<WeightRule *>(lastRule.get());
+    WeightRule* generatedConstraints = dynamic_cast<WeightRule *>(lastRule.get());
     CPPUNIT_ASSERT_DOUBLES_EQUAL(-1, generatedConstraints->upperLimit, 1.0E-10);
     CPPUNIT_ASSERT_EQUAL(2, (int) generatedConstraints->positiveBody.size());
     CPPUNIT_ASSERT_DOUBLES_EQUAL(-1, generatedConstraints->positiveBody.at(3), 1.0E-10);

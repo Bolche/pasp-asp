@@ -11,38 +11,38 @@
 typedef int Literal;
 
 struct Rule {
-    enum RuleType { BASIC, CONSTRAINT, WEIGHTCONSTRAINT };
-    RuleType type;
+    enum RuleType { BASIC, CHOICE, CONSTRAINT, WEIGHTCONSTRAINT };
+    virtual RuleType getType() const = 0;
 };
 
 struct BasicRule: public Rule {
-    BasicRule(const Literal h, const std::vector<Literal>& p, const std::vector<Literal>& n) : head(h), positiveBody(p), negativeBody(n), type(BASIC) {};
+BasicRule(const Literal h, const std::vector<Literal>& p, const std::vector<Literal>& n) : head(h), positiveBody(p), negativeBody(n) {};
+    RuleType getType() const {return BASIC;};
     Literal head;
     std::vector<Literal> positiveBody;
     std::vector<Literal> negativeBody;
-    RuleType type;
 };
 
 struct ChoiceRule: public Rule {
-ChoiceRule(const std::vector<Literal>& h, const std::vector<Literal>& p, const std::vector<Literal>& n) : head(h), positiveBody(p), negativeBody(n), type(BASIC) {};
+ChoiceRule(const std::vector<Literal>& h, const std::vector<Literal>& p, const std::vector<Literal>& n) : head(h), positiveBody(p), negativeBody(n) {};
+    RuleType getType() const {return CHOICE;};
     std::vector<Literal> head;
     std::vector<Literal> positiveBody;
     std::vector<Literal> negativeBody;
-    RuleType type;
 };
 
 struct ConstraintRule: public Rule {
-    ConstraintRule(const std::vector<Literal>& p, const std::vector<Literal>& n) : positiveBody(p), negativeBody(n), type(CONSTRAINT) {};
+ConstraintRule(const std::vector<Literal>& p, const std::vector<Literal>& n) : positiveBody(p), negativeBody(n) {};
+    RuleType getType() const {return CONSTRAINT;};
     std::vector<Literal> positiveBody;
     std::vector<Literal> negativeBody;
-    RuleType type;
 };
 
 struct WeightRule: public Rule {
-    WeightRule(const std::unordered_map<Literal, double>& b, const double l) : positiveBody(b), upperLimit(l), type(WEIGHTCONSTRAINT) {};
+WeightRule(const std::unordered_map<Literal, double>& b, const double l) : positiveBody(b), upperLimit(l) {};
+    RuleType getType() const {return WEIGHTCONSTRAINT;};
     std::unordered_map<Literal, double> positiveBody;
     double upperLimit;
-    RuleType type;
 };
 
 typedef std::shared_ptr<Rule> Rule_ptr;

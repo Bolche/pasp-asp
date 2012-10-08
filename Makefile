@@ -17,12 +17,12 @@ TEST_OBJECTS = $(addprefix $(BUILD_DIR)/, $(TEST_SOURCES:.cpp=.o))
 #Define type of compilation
 TYPE=debug
 ifeq ($(TYPE),debug)
-    LDFLAGS = 
+    LDFLAGS = -lsmodels -Lsmodels
     CCFLAGS = -Wall -pedantic -I. -g -O0
 endif
 
 ifeq ($(TYPE),release)
-    LDFLAGS = -s -pipe
+    LDFLAGS = -s -pipe -lsmodels -Lsmodels
     CCFLAGS = -Wall -pedantic -I. -O3 -march=native
 endif
 
