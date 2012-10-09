@@ -15,7 +15,7 @@ unordered_set<Literal> SmodelsBridge::getAnswerSet(const Program &p) {
 
     string programString = smodelsProgram.str();
 #ifdef PRINT_DEBUG
-    cout << "DEBUG:\n" << programString;
+    cout << "---\nDEBUG:\n" << programString;
 #endif
     
     pid_t pid;
@@ -49,11 +49,12 @@ unordered_set<Literal> SmodelsBridge::getAnswerSet(const Program &p) {
     int status;
     waitpid(pid, &status, 0);
     
-    while (int c = read(outputpipe[0], buf, sizeof(buf))) {
+    while (int c = read(outputpipe[0], buf, sizeof(buf)-1)) {
         if (c == -1) {
             perror("Error reading response from smodels");
             exit(1);
         }
+        buf[c]=0;
         smodelsResponseBuf << buf;
     }
     close(outputpipe[0]);
