@@ -72,11 +72,13 @@ unordered_set<Literal> SmodelsBridge::getAnswerSet(const Program &p) {
         getline(smodelsResponseBuf, line);
         stringstream asStream(line);
         string atom;
-        smodelsResponseBuf >> atom;
-        smodelsResponseBuf >> atom;
-        while (!smodelsResponseBuf.eof()) {
+        char colon = 0;
+        while (colon != ':')
+            asStream >> colon;
+        asStream >> atom;
+        while (!asStream.eof()) {
             answerSet.insert(nameToLiteral(atom.c_str()));
-            smodelsResponseBuf >> atom;
+            asStream >> atom;
         }   
     } else {
     cerr << "Error parsing smodels output:" << line << endl;

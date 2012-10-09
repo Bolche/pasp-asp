@@ -18,12 +18,12 @@ TEST_OBJECTS = $(addprefix $(BUILD_DIR)/, $(TEST_SOURCES:.cpp=.o))
 #Define type of compilation
 TYPE=debug
 ifeq ($(TYPE),debug)
-    LDFLAGS = $(EXTRA_LDFLAGS)
+    LDFLAGS = -lm $(EXTRA_LDFLAGS)
     CCFLAGS = -Wall -pedantic -I. -g -O0 -DPRINT_DEBUG
 endif
 
 ifeq ($(TYPE),release)
-    LDFLAGS = -s -pipe $(EXTRA_LDFLAGS)
+    LDFLAGS = -s -pipe -lm $(EXTRA_LDFLAGS)
     CCFLAGS = -Wall -pedantic -I. -O3 -march=native
 endif
 

@@ -4,9 +4,17 @@
 #include <cstdlib>
 #include <limits>
 #include <Eigen/LU>
+#include <cmath>
 
 #include "Program.h"
 #include "Bridge.h"
+#include "tests/assertListEqual.h"
+
+inline bool isNotNAN(const Eigen::VectorXd& x) {
+    for (int i = 0; i < x.size(); i++)
+        if (std::isnan((double) x[i])) return false;
+    return true;
+}
 
 unsigned int Program::numProbabilities() const {
     return probabilityTable.size();
@@ -68,6 +76,8 @@ pair<Eigen::MatrixXd, Eigen::VectorXd> Program::solve() const {
         if (A.size() == 0)
             throw false;
         changeBase(base, inverseBase, A, pi, costs);
+        // BUG!
+        cout << base.inverse() << endl;
         pi = inverseBase * p;
     }
 
@@ -79,9 +89,6 @@ Eigen::VectorXd Program::selectColumn(const Eigen::MatrixXd &inverseBase, const 
     unordered_map<Literal, long> weightConstraint;
     unsigned int i;
     map<Literal, double>::const_iterator it;
-#ifdef PRINT_DEBUG
-    cout << "DEBUG:\nu*det(B)=" << u * determinant << endl;
-#endif
     for(it = probabilityTable.begin(), i=1; it != probabilityTable.end(); it++, i++) {
         weightConstraint.insert(make_pair(it->first, u[i]));
     }
@@ -100,8 +107,9 @@ Eigen::VectorXd Program::answerSetToVector(const unordered_set<Literal>& as) con
     Eigen::VectorXd v(numProbabilities()+1);
     unsigned int i;
     map<Literal, double>::const_iterator it;
-    for(it = probabilityTable.begin(), i=1; it != probabilityTable.end(); it++, i++)
+    for(it = probabilityTable.begin(), i=1; it != probabilityTable.end(); it++, i++) {
         v[i] = as.count(it->first);
+    }
     v[0] = 1;
     return v;
 }
@@ -112,6 +120,7 @@ void Program::changeBase(Eigen::MatrixXd &base, Eigen::MatrixXd &inverseBase, co
     // Turn all negative coeficientes into infinity
     u = u + ((u.array() > 0).cast<double>() * numeric_limits<double>::infinity()).matrix();
     pi.cwiseQuotient(u).minCoeff(&minIndex);
+    cout << pi.cwiseQuotient(u) << " " << pi[minIndex] / u[minIndex] << endl;
 
     base.col(minIndex) = A;
     inverseBase = base.inverse();
