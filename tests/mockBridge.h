@@ -6,6 +6,7 @@
 
 class MockBridge : public Bridge {
 public:
+    MockBridge() : responseCount(0) {};
     MockBridge(const vector<unordered_set<Literal>> &as) : answerSets(as), responseCount(0) {};
     unordered_set<Literal> getAnswerSet(const Program &p);
     bool existsAnswerSet(const Program &p);

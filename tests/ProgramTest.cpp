@@ -16,7 +16,7 @@
 
 CPPUNIT_TEST_SUITE_REGISTRATION(ProgramTest);
 
-MockBridge mock(std::vector<std::unordered_set<Literal>>({{}}));
+MockBridge mock;
 Program p1(&mock);
 
 ProgramTest::ProgramTest() {
