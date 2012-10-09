@@ -2,6 +2,7 @@
 #include <iostream>
 #include <cstdlib>
 #include <unistd.h>
+#include <sys/wait.h>
 #include <string>
 
 #include "SmodelsBridge.h"
@@ -32,7 +33,7 @@ unordered_set<Literal> SmodelsBridge::getAnswerSet(const Program &p) {
         close(inputpipe[1]);
         close(outputpipe[0]);
         close(outputpipe[1]);
-        execl(smodelsExecPath, (char*) NULL);
+        execl(smodelsExecPath, smodelsExecPath, (char*) NULL);
         exit(1);
     }
 

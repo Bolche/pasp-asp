@@ -5,7 +5,7 @@
 
 class SmodelsBridge: public Bridge {
 public:
-    SmodelsBridge(char* s) : smodelsExecPath(s) {};
+    SmodelsBridge(char* s) : maxLiteral(0), smodelsExecPath(s) {};
     std::unordered_set<Literal> getAnswerSet(const Program &p);
     bool existsAnswerSet(const Program &p);
 private:
@@ -20,7 +20,7 @@ private:
     void createSmodelsRule(stringstream &, const ChoiceRule *);
     void createSmodelsRule(stringstream &, const WeightRule *);
     void createSmodelsRule(stringstream &, const ConstraintRule *);
-    Literal maxLiteral = 0;
+    Literal maxLiteral;
     char *smodelsExecPath;
 };
 

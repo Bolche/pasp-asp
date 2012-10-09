@@ -11,8 +11,8 @@
 #include "ProgramTest.h"
 #include "assertListEqual.h"
 
-#include "MockBridge.h"
-//#include "assertListEqual.h"
+#include "mockBridge.h"
+
 
 CPPUNIT_TEST_SUITE_REGISTRATION(ProgramTest);
 
