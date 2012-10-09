@@ -18,27 +18,47 @@ unordered_set<Literal> SmodelsBridge::getAnswerSet(const Program &p) {
 #endif
     
     pid_t pid;
-    int pipefd[2];
-    char buf[256];
+    int inputpipe[2], outputpipe[2];
+    char buf[1024];
 
-    pipe(pipefd);
+    pipe(inputpipe);
+    pipe(outputpipe);
     pid = fork();
     if (pid == 0) {
         // Child
-        dup2(pipefd[0], STDIN_FILENO);
-        dup2(pipefd[1], STDOUT_FILENO);
-        dup2(pipefd[1], STDERR_FILENO);
+        dup2(inputpipe[0], STDIN_FILENO);
+        dup2(outputpipe[1], STDOUT_FILENO);
+        close(inputpipe[0]);
+        close(inputpipe[1]);
+        close(outputpipe[0]);
+        close(outputpipe[1]);
         execl(smodelsExecPath, (char*) NULL);
         exit(1);
     }
 
-    write(pipefd[0], programString.c_str(), programString.size()); // write message to the process
-    while (read(pipefd[1], buf, sizeof(buf))) {
+    close(inputpipe[0]);
+    close(outputpipe[1]);
+    
+    if (write(inputpipe[1], programString.c_str(), programString.size())==-1) {
+        perror("Error writing to smodels");
+        exit(1);
+    }
+    close(inputpipe[1]);
+
+    int status;
+    waitpid(pid, &status, 0);
+    
+    while (int c = read(outputpipe[0], buf, sizeof(buf))) {
+        if (c == -1) {
+            perror("Error reading response from smodels");
+            exit(1);
+        }
         smodelsResponseBuf << buf;
     }
+    close(outputpipe[0]);
 
 #ifdef PRINT_DEBUG
-    cout << "DEBUG:\n" << smodelsResponseBuf;
+    cout << "---\nDEBUG:\n" << smodelsResponseBuf.str();
 #endif
     
     unordered_set<Literal> answerSet;
@@ -58,7 +78,7 @@ unordered_set<Literal> SmodelsBridge::getAnswerSet(const Program &p) {
             smodelsResponseBuf >> atom;
         }   
     } else {
-        cerr << "Error parsing smodels output" << endl;
+    cerr << "Error parsing smodels output:" << line << endl;
         exit(1);
     }
 

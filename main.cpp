@@ -12,13 +12,14 @@ int main (int argc, char** argv) {
     if (argc < 3)
         fatal("Usage: pasp-asp [file] [smodels path]");
     
+
     SmodelsBridge sb (argv[2]);
     Program p(&sb);
-    
+
     parseGroundedASP(p, cin);
     ifstream probabilitiesFile (argv[1]);
     parseProbabilities(p, probabilitiesFile);
-
+    
     pair<Eigen::MatrixXd, Eigen::VectorXd> solution;
     try {
         solution = p.solve();
