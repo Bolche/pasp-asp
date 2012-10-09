@@ -112,7 +112,7 @@ void ProgramTest::testSelectColumn() {
     Eigen::VectorXd costs(3); costs << 1,0,0;
 
     Eigen::VectorXd expected(3); expected << 1, 0, 1;
-    CPPUNIT_ASSERT_EQUAL(expected, p1.selectColumn(inverseBase, costs));
+    CPPUNIT_ASSERT_EQUAL(expected, p1.selectColumn(inverseBase, base.determinant(), costs));
 
     expected[0] = 1; expected[1] = -1; expected[2] = 0;
     CPPUNIT_ASSERT_EQUAL(expected, Eigen::VectorXd(costs.transpose() * inverseBase));

@@ -1,0 +1,1 @@
+make CC=g++-mp-4.7 EXTRA_LDFLAGS=-L/opt/local/lib LIBTOOL=glibtool

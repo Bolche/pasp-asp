@@ -14,6 +14,7 @@ inline void parseRules(Program &p, istream &in) {
     while (ruleType != 0) {
         switch (ruleType) {
         case 1:
+        {
             Literal head;
             int bodySize, negativeBodySize;
             in >> head >> bodySize >> negativeBodySize;
@@ -25,13 +26,15 @@ inline void parseRules(Program &p, istream &in) {
                 in >> positiveBody[i];
         
             p.addRule(make_shared<BasicRule>(head, positiveBody, negativeBody));
+        }
             break;
         case 3:
+        {
             int headSize, bodySize, negativeBodySize;
             in >> headSize;
-            vector<Literal> head(headSize);
+            vector<Literal> headVec(headSize);
             for (int i = 0; i < headSize; i++)
-                in >> head[i];
+                in >> headVec[i];
 
             in >> bodySize >> negativeBodySize;
             vector<Literal> negativeBody(negativeBodySize), positiveBody(bodySize - negativeBodySize);
@@ -41,11 +44,13 @@ inline void parseRules(Program &p, istream &in) {
             for (int i = 0; i < bodySize - negativeBodySize; i++)
                 in >> positiveBody[i];
         
-            p.addRule(make_shared<ChoiceRule>(head, positiveBody, negativeBody));
+            p.addRule(make_shared<ChoiceRule>(headVec, positiveBody, negativeBody));
+        }
             break;
         default:
             fatal("unsupported rule type");
         in >> ruleType;
+        }
     }
 }
 

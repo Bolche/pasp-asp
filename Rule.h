@@ -39,10 +39,10 @@ ConstraintRule(const std::vector<Literal>& p, const std::vector<Literal>& n) : p
 };
 
 struct WeightRule: public Rule {
-WeightRule(const std::unordered_map<Literal, double>& b, const double l) : positiveBody(b), upperLimit(l) {};
+WeightRule(const std::unordered_map<Literal, long>& b, const long l) : positiveBody(b), upperLimit(l) {};
     RuleType getType() const {return WEIGHTCONSTRAINT;};
-    std::unordered_map<Literal, double> positiveBody;
-    double upperLimit;
+    std::unordered_map<Literal, long> positiveBody;
+    long upperLimit;
 };
 
 typedef std::shared_ptr<Rule> Rule_ptr;

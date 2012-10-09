@@ -63,7 +63,7 @@ pair<Eigen::MatrixXd, Eigen::VectorXd> Program::solve() const {
     Eigen::MatrixXd inverseBase = base.inverse();
     Eigen::VectorXd pi = inverseBase * p;
     while (costs.dot(pi) > 0) {
-        Eigen::VectorXd A = selectColumn(inverseBase, costs);
+        Eigen::VectorXd A = selectColumn(inverseBase, base.determinant(), costs);
         if (A.size() == 0)
             throw false;
         changeBase(base, inverseBase, A, pi, costs);
@@ -73,13 +73,13 @@ pair<Eigen::MatrixXd, Eigen::VectorXd> Program::solve() const {
     return make_pair(base, pi);
 }
 
-Eigen::VectorXd Program::selectColumn(const Eigen::MatrixXd &inverseBase, const Eigen::VectorXd &costs) const {
+Eigen::VectorXd Program::selectColumn(const Eigen::MatrixXd &inverseBase, const double determinant, const Eigen::VectorXd &costs) const {
     Eigen::RowVectorXd u = costs.transpose() * inverseBase;
-    unordered_map<Literal, double> weightConstraint;
+    unordered_map<Literal, long> weightConstraint;
     unsigned int i;
     map<Literal, double>::const_iterator it;
     for(it = probabilityTable.begin(), i=1; it != probabilityTable.end(); it++, i++) {
-        weightConstraint.insert(make_pair(it->first, u[i]));
+        weightConstraint.insert(make_pair(it->first, u[i]*determinant));
     }
 
     Program newProg(*this);

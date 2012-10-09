@@ -16,13 +16,13 @@ smodels: $(OBJS)
 
 .PHONY: lib libinstall clean all build binary install
 
-LIBPATH = /usr/local/lib
+#LIBPATH = /usr/local/lib
 LIBOBJS = $(LIBSRCS:.cc=.lo)
 
 # Make a shared library
 lib: $(LIBOBJS)
 	$(LIBTOOL) --mode=link --tag=CXX $(CXX) $(LFLAGS) -o libsmodels.la \
-		$(LIBOBJS) -rpath $(LIBPATH)
+		$(LIBOBJS)
 
 %.lo: %.cc
 	$(LIBTOOL) --mode=compile --tag=CXX $(CXX) $(CXXFLAGS) -c $<

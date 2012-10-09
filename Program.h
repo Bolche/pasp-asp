@@ -37,7 +37,7 @@ public:
     list<Literal> negativeTargets;
 private:
     void setInitialBase(Eigen::MatrixXd &m) const;
-    Eigen::VectorXd selectColumn(const Eigen::MatrixXd &base, const Eigen::VectorXd &costs) const;
+    Eigen::VectorXd selectColumn(const Eigen::MatrixXd&, const double, const Eigen::VectorXd &) const;
     void changeBase(Eigen::MatrixXd&, Eigen::MatrixXd&, const Eigen::VectorXd&, const Eigen::VectorXd&, Eigen::VectorXd&) const;
     Eigen::VectorXd answerSetToVector(const unordered_set<Literal>&) const;
     list<Rule_ptr> rules;

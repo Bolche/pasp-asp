@@ -9,11 +9,11 @@
 using namespace std;
 
 int main (int argc, char** argv) {
-    SmodelsBridge sb;
+    if (argc < 3)
+        fatal("Usage: pasp-asp [file] [smodels path]");
+    
+    SmodelsBridge sb (argv[2]);
     Program p(&sb);
-
-    if (argc < 2)
-        fatal("Usage: pasp-asp [file]");
     
     parseGroundedASP(p, cin);
     ifstream probabilitiesFile (argv[1]);
