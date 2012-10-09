@@ -41,23 +41,6 @@ void ProgramTest::setUp() {
 void ProgramTest::tearDown() {
 }
 
-void ProgramTest::testConsistentWithPartialAS() {
-    mock.setNewAnswerSetSet({ {0}, {1, 3}, {2, 3, 4}});
-    CPPUNIT_ASSERT(! p1.consistent( Eigen::Vector3d({1, 0, 0}) ));
-    CPPUNIT_ASSERT(p1.consistent( Eigen::Vector3d({1, 1, 0}) ));
-    CPPUNIT_ASSERT(p1.consistent( Eigen::Vector3d({1, 1, 1}) ));
-
-    Rule_ptr generatedConstraints = *(--mock.spyArguments(0).rulesEndIterator());
-    CPPUNIT_ASSERT_LIST_EQUALS(vector<Literal>({3, 4}), dynamic_cast<ConstraintRule *>(generatedConstraints.get())->positiveBody);
-
-    generatedConstraints = *(--mock.spyArguments(1).rulesEndIterator());
-    CPPUNIT_ASSERT_LIST_EQUALS(vector<Literal>({4}), dynamic_cast<ConstraintRule *>(generatedConstraints.get())->positiveBody);
-    CPPUNIT_ASSERT_LIST_EQUALS(vector<Literal>({3}), dynamic_cast<ConstraintRule *>(generatedConstraints.get())->negativeBody);
-    
-    generatedConstraints = *(--mock.spyArguments(2).rulesEndIterator());
-    CPPUNIT_ASSERT_LIST_EQUALS(vector<Literal>({3, 4}), dynamic_cast<ConstraintRule *>(generatedConstraints.get())->negativeBody);
-}
-
 void ProgramTest::testChangeBase() {
     Eigen::MatrixXd m(3,3);
     m<< 1, 1, 1,

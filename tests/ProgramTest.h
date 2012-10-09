@@ -18,7 +18,6 @@ using namespace std;
 
 class ProgramTest : public CPPUNIT_NS::TestFixture {
     CPPUNIT_TEST_SUITE(ProgramTest);
-    CPPUNIT_TEST(testConsistentWithPartialAS);
     CPPUNIT_TEST(testChangeBase);
     CPPUNIT_TEST(testAnswerSetToBase);
     CPPUNIT_TEST(testSelectColumn);
@@ -31,7 +30,6 @@ public:
     void tearDown();
 
 private:
-    void testConsistentWithPartialAS();
     void testChangeBase();
     void testAnswerSetToBase();
     void testSelectColumn();

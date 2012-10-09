@@ -76,8 +76,6 @@ pair<Eigen::MatrixXd, Eigen::VectorXd> Program::solve() const {
         if (A.size() == 0)
             throw false;
         changeBase(base, inverseBase, A, pi, costs);
-        // BUG!
-        cout << base.inverse() << endl;
         pi = inverseBase * p;
     }
 
@@ -115,12 +113,18 @@ Eigen::VectorXd Program::answerSetToVector(const unordered_set<Literal>& as) con
 }
 
 void Program::changeBase(Eigen::MatrixXd &base, Eigen::MatrixXd &inverseBase, const Eigen::VectorXd &A, const Eigen::VectorXd &pi, Eigen::VectorXd &costs) const {
-    Eigen::VectorXd u = inverseBase * A;
+    double minTheta = numeric_limits<double>::infinity();
     unsigned int minIndex;
-    // Turn all negative coeficientes into infinity
-    u = u + ((u.array() > 0).cast<double>() * numeric_limits<double>::infinity()).matrix();
-    pi.cwiseQuotient(u).minCoeff(&minIndex);
-    cout << pi.cwiseQuotient(u) << " " << pi[minIndex] / u[minIndex] << endl;
+    Eigen::VectorXd u = inverseBase * A;
+    Eigen::VectorXd theta = pi.cwiseQuotient(u);
+    for(unsigned int i=0; i < u.size(); i++) {
+        if (u[i] > 0) {
+            if(theta[i] < minTheta) {
+                minTheta = theta[i];
+                minIndex = i;
+            }
+        }
+    }
 
     base.col(minIndex) = A;
     inverseBase = base.inverse();
