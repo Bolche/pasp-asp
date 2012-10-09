@@ -161,7 +161,7 @@ void SmodelsBridge::createSmodelsRule(stringstream &smodelsProgram, const Constr
     smodelsProgram << endl;
 }
 void SmodelsBridge::createSmodelsRule(stringstream &smodelsProgram, const WeightRule *rule) {
-    unsigned long negativeWeights = 0;
+    long negativeWeights = 0;
     stringstream positive, negative, weightsNeg, weightsPos;
     unsigned int numNegatives = 0;
     for (auto it = rule->positiveBody.begin(); it != rule->positiveBody.end(); it++) {
@@ -169,7 +169,7 @@ void SmodelsBridge::createSmodelsRule(stringstream &smodelsProgram, const Weight
             numNegatives++;
             negative << ' ' << it->first;
             weightsNeg << ' ' << -it->second;
-            negativeWeights += it->second;
+            negativeWeights -= it->second;
         } else {
             positive << ' ' << it->first;
             weightsPos << ' ' << it->second;
@@ -179,8 +179,8 @@ void SmodelsBridge::createSmodelsRule(stringstream &smodelsProgram, const Weight
     Literal newLit = ++maxLiteral;
     smodelsProgram << "1 1 1 1 " << newLit << endl;
     smodelsProgram << "5 " << newLit << ' ' << (rule->upperLimit + negativeWeights + 1) << ' ' <<
-        rule->positiveBody.size() << ' ' << numNegatives << ' ' << negative << ' ' << positive <<
-        ' ' << weightsNeg << weightsPos << endl;
+        rule->positiveBody.size() << ' ' << numNegatives  << negative.str() << positive.str() <<
+        weightsNeg.str() << weightsPos.str() << endl;
 }
 
 /* TODO optimize this */ 

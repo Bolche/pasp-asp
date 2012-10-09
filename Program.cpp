@@ -1,5 +1,6 @@
 #include <algorithm>
 #include <sstream>
+#include <iostream>
 #include <cstdlib>
 #include <limits>
 #include <Eigen/LU>
@@ -74,12 +75,15 @@ pair<Eigen::MatrixXd, Eigen::VectorXd> Program::solve() const {
 }
 
 Eigen::VectorXd Program::selectColumn(const Eigen::MatrixXd &inverseBase, const double determinant, const Eigen::VectorXd &costs) const {
-    Eigen::RowVectorXd u = costs.transpose() * inverseBase;
+    Eigen::RowVectorXd u = (costs.transpose() * inverseBase) * determinant;
     unordered_map<Literal, long> weightConstraint;
     unsigned int i;
     map<Literal, double>::const_iterator it;
+#ifdef PRINT_DEBUG
+    cout << "DEBUG:\nu*det(B)=" << u * determinant << endl;
+#endif
     for(it = probabilityTable.begin(), i=1; it != probabilityTable.end(); it++, i++) {
-        weightConstraint.insert(make_pair(it->first, u[i]*determinant));
+        weightConstraint.insert(make_pair(it->first, u[i]));
     }
 
     Program newProg(*this);
@@ -123,16 +127,14 @@ void Program::setInitialBase(Eigen::MatrixXd &m) const {
 bool Program::consistent(const Eigen::VectorXd &v) const {
     int i;
     map<Literal, double>::const_iterator it;
-    vector<Literal> positiveLiterals, negativeLiterals;
+    Program newProg(*this);
     for(it = probabilityTable.begin(), i=1; it != probabilityTable.end(); it++, i++) {
         if (!v[i])
-            positiveLiterals.push_back(it->first);
+            newProg.addRule(make_shared<ConstraintRule>(vector<Literal>({it->first}), vector<Literal>()));
         else
-            negativeLiterals.push_back(it->first);
+            newProg.addRule(make_shared<ConstraintRule>(vector<Literal>(), vector<Literal>({it->first})));
     }
 
-    Program newProg(*this);
-    newProg.addRule(make_shared<ConstraintRule>(positiveLiterals, negativeLiterals));
     return newProg.consistent();        
 }
 
