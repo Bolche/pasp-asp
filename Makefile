@@ -16,7 +16,7 @@ TEST_SOURCES = $(wildcard tests/*.cpp)
 TEST_OBJECTS = $(addprefix $(BUILD_DIR)/, $(TEST_SOURCES:.cpp=.o))
 
 #Define type of compilation
-TYPE=debug
+TYPE=release
 ifeq ($(TYPE),debug)
     LDFLAGS = -lm $(EXTRA_LDFLAGS)
     CCFLAGS = -Wall -pedantic -I. -g -O0 -DPRINT_DEBUG
