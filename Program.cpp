@@ -8,13 +8,6 @@
 
 #include "Program.h"
 #include "Bridge.h"
-#include "tests/assertListEqual.h"
-
-inline bool isNotNAN(const Eigen::VectorXd& x) {
-    for (int i = 0; i < x.size(); i++)
-        if (std::isnan((double) x[i])) return false;
-    return true;
-}
 
 unsigned int Program::numProbabilities() const {
     return probabilityTable.size();
@@ -74,7 +67,7 @@ pair<Eigen::MatrixXd, Eigen::VectorXd> Program::solve() const {
 #ifdef PRINT_DEBUG
     cout << "---\nINITIAL pi:\n" << pi << endl;
 #endif
-    while (costs.dot(pi) > 0 || pi.minCoeff() < 0) {
+    while (costs.dot(pi) > 0) {
         Eigen::VectorXd A = selectColumn(inverseBase, base.determinant(), costs);
         if (A.size() == 0)
             throw false;
@@ -117,7 +110,7 @@ Eigen::VectorXd Program::answerSetToVector(const unordered_set<Literal>& as) con
 
 void Program::changeBase(Eigen::MatrixXd &base, Eigen::MatrixXd &inverseBase, const Eigen::VectorXd &A, const Eigen::VectorXd &pi, Eigen::VectorXd &costs) const {
     double minTheta = numeric_limits<double>::infinity();
-    unsigned int minIndex=0;
+    unsigned int minIndex = 0;
     Eigen::VectorXd u = inverseBase * A;
     Eigen::VectorXd theta = pi.cwiseQuotient(u);
     for(unsigned int i=0; i < u.size(); i++) {
