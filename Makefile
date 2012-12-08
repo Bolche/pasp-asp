@@ -16,15 +16,21 @@ TEST_SOURCES = $(wildcard tests/*.cpp)
 TEST_OBJECTS = $(addprefix $(BUILD_DIR)/, $(TEST_SOURCES:.cpp=.o))
 
 #Define type of compilation
-TYPE=debug
+TYPE=release
 ifeq ($(TYPE),debug)
     LDFLAGS = -lm $(EXTRA_LDFLAGS)
-    CCFLAGS = -Wall -pedantic -I. -g -O0 -DPRINT_DEBUG
+    CCFLAGS = -Wall -pedantic -I. -g -O0
+    PRINTDEBUG = 1
 endif
 
 ifeq ($(TYPE),release)
     LDFLAGS = -s -pipe -lm $(EXTRA_LDFLAGS)
     CCFLAGS = -Wall -pedantic -I. -O3 -march=native
+    PRINTDEBUG = 0
+endif
+
+ifeq ($(PRINTDEBUG),1)
+    CCFLAGS += -DPRINT_DEBUG
 endif
 
 #Test for C++11 support

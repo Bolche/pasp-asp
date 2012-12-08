@@ -22,8 +22,7 @@ unordered_set<Literal> SmodelsBridge::getAnswerSet(const Program &p) {
     int inputpipe[2], outputpipe[2];
     char buf[1024];
 
-    pipe(inputpipe);
-    pipe(outputpipe);
+    if (pipe(inputpipe) == -1 || pipe(outputpipe) == -1) perror("Error creating pipe");
     pid = fork();
     if (pid == 0) {
         // Child
