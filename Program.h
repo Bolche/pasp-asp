@@ -3,6 +3,7 @@
 
 #include <string>
 #include <map>
+#include <set>
 #include <list>
 #include <unordered_map>
 #include <unordered_set>
@@ -15,6 +16,11 @@
 class Bridge;
 
 using namespace std;
+
+struct SecondElementComparator {
+    bool operator() (const pair<Literal, double>& lhs, const pair<Literal, double>& rhs) const { return lhs.second > rhs.second; }
+};
+
 
 /* Represents a program */
 class Program {
@@ -42,10 +48,10 @@ private:
     Eigen::VectorXd answerSetToVector(const unordered_set<Literal>&) const;
     list<Rule_ptr> rules;
     unordered_map<Literal, string> symTable;
-    map<Literal, double> probabilityTable;
+    /* This must be in a descending order. That's the reason for this type */
+    set<pair<Literal, double>, SecondElementComparator> probabilityTable;
     Bridge *bridge;
 
     friend class ProgramTest;
 };
-
 #endif	/* PASPPROGRAM_H */

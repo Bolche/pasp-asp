@@ -24,7 +24,7 @@ void Program::assignProbability(const string& literalName, double n) {
             break;
 
     if (begin != symTable.end())
-        probabilityTable[begin->first]=n;
+        probabilityTable.insert(make_pair(begin->first,n));
 }
 
 string Program::getLiteralName(const Literal& l) const {
@@ -32,7 +32,10 @@ string Program::getLiteralName(const Literal& l) const {
 }
 
 double Program::getLiteralProbability(const Literal& l) const {
-    return probabilityTable.at(l);
+    for (auto it = probabilityTable.begin(); it!=probabilityTable.end(); it++)
+        if ( it->first == l )
+            return it->second;
+    return -1.0;
 }
 
 void Program::addRule(Rule_ptr r) {
@@ -57,7 +60,7 @@ pair<Eigen::MatrixXd, Eigen::VectorXd> Program::solve() const {
 
     Eigen::VectorXd p(matrixSize);
     unsigned int i;
-    map<Literal, double>::const_iterator it;
+    set<pair<Literal, double>>::const_iterator it;
     for(it = probabilityTable.begin(), i=1; it != probabilityTable.end(); it++, i++)
         p[i] = it->second;
     p[0] = 1;
@@ -65,7 +68,7 @@ pair<Eigen::MatrixXd, Eigen::VectorXd> Program::solve() const {
     Eigen::MatrixXd inverseBase = base.inverse();
     Eigen::VectorXd pi = inverseBase * p;
 #ifdef PRINT_DEBUG
-    cout << "---\nINITIAL pi:\n" << pi << endl;
+    cout << "---\nINITIAL pi:\n" << pi << "\n---\ncosts:\n" << costs << endl;
 #endif
     while (costs.dot(pi) > 0) {
         Eigen::VectorXd A = selectColumn(inverseBase, base.determinant(), costs);
@@ -82,7 +85,7 @@ Eigen::VectorXd Program::selectColumn(const Eigen::MatrixXd &inverseBase, const 
     Eigen::RowVectorXd u = (costs.transpose() * inverseBase) * determinant;
     unordered_map<Literal, long> weightConstraint;
     unsigned int i;
-    map<Literal, double>::const_iterator it;
+    set<pair<Literal, double>>::const_iterator it;
     for(it = probabilityTable.begin(), i=1; it != probabilityTable.end(); it++, i++) {
         weightConstraint.insert(make_pair(it->first, u[i]));
     }
@@ -100,7 +103,7 @@ Eigen::VectorXd Program::selectColumn(const Eigen::MatrixXd &inverseBase, const 
 Eigen::VectorXd Program::answerSetToVector(const unordered_set<Literal>& as) const {
     Eigen::VectorXd v(numProbabilities()+1);
     unsigned int i;
-    map<Literal, double>::const_iterator it;
+    set<pair<Literal, double>>::const_iterator it;
     for(it = probabilityTable.begin(), i=1; it != probabilityTable.end(); it++, i++) {
         v[i] = as.count(it->first);
     }
@@ -135,7 +138,7 @@ void Program::setInitialBase(Eigen::MatrixXd &m) const {
 
 bool Program::consistent(const Eigen::VectorXd &v) const {
     int i;
-    map<Literal, double>::const_iterator it;
+    set<pair<Literal, double>>::const_iterator it;
     Program newProg(*this);
     for(it = probabilityTable.begin(), i=1; it != probabilityTable.end(); it++, i++) {
         if (!v[i])
