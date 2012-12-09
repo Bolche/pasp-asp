@@ -1,3 +1,4 @@
+smodels/smodels
 Makefile.deps
-bin/
-build/
+bin/*
+build/*
